@@ -1,11 +1,12 @@
 package org.lance.http;
 
+import lombok.extern.slf4j.Slf4j;
+import org.lance.controller.AnimeController;
 import org.lance.utils.OSUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.lance.websocket.WebSocketServer;
 
+@Slf4j
 public abstract class AbstractApplication {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApplication.class);
 
     private static final int REST_PORT = 2333;
 
@@ -13,7 +14,9 @@ public abstract class AbstractApplication {
 
     protected abstract void setupServer();
 
-    public abstract void startServer();
+    private HttpServer httpServer;
+
+    private WebSocketServer webSocketServer;
 
     public void start() {
         checkPort();
@@ -23,8 +26,45 @@ public abstract class AbstractApplication {
 
     private static void checkPort() {
         if (OSUtil.checkIsPortsUsing(REST_PORT, WEBSOCKET_PORT)) {
-            LOGGER.error("Port is already in use!");
+            log.error("Port is already in use!");
             System.exit(0);
+        }
+    }
+
+    protected void setupHttpServer() {
+        httpServer = new HttpServer(REST_PORT);
+        httpServer.addController(new AnimeController());
+    }
+
+    protected void setupWebSocketServer() {
+        webSocketServer = new WebSocketServer("127.0.0.1", WEBSOCKET_PORT);
+    }
+
+    public void startServer() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                stopServer();
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }));
+
+        if (httpServer != null) {
+            httpServer.start();
+            log.info("http server 启动");
+        }
+        if (webSocketServer != null) {
+            webSocketServer.start();
+            log.info("websocket server 启动");
+        }
+    }
+
+    public void stopServer() {
+        if (httpServer != null) {
+            httpServer.stopServer();
+        }
+        if (webSocketServer != null) {
+            webSocketServer.closeServer();
         }
     }
 }
