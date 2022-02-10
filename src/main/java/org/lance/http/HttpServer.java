@@ -37,15 +37,16 @@ public class HttpServer extends Thread {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup);
+            b.channel(NioServerSocketChannel.class);
             b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
             b.childOption(ChannelOption.TCP_NODELAY, true);
-            b.channel(NioServerSocketChannel.class);
             b.childHandler(new ChannelInitializer<Channel>() {
                 @Override
                 protected void initChannel(Channel ch) {
-                    ch.pipeline().addLast("httpCodec", new HttpServerCodec());
-                    ch.pipeline().addLast(new HttpObjectAggregator(4194304));
-                    ch.pipeline().addLast("serverHandle", new HttpServerHandler(controllerList));
+                    ch.pipeline()
+                            .addLast("httpCodec", new HttpServerCodec())
+                            .addLast(new HttpObjectAggregator(4194304))
+                            .addLast("serverHandle", new HttpServerHandler(controllerList));
                 }
             });
             serverChannel = b.bind(port).sync().channel();
