@@ -26,6 +26,11 @@ public class AnimeApplication extends AbstractApplication {
         ParserManager.getInstance().init();
     }
 
+    @Override
+    public void stopServer() {
+        super.stopServer();
+    }
+
     public static AnimeApplication animeApplication() {
         return animeApplication;
     }

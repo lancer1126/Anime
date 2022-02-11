@@ -18,14 +18,14 @@ import java.util.List;
 @Slf4j
 public class HttpServer extends Thread {
 
-    private int port;
+    private final int PORT;
 
     private List<Object> controllerList;
 
     private static Channel serverChannel;
 
     public HttpServer(int port) {
-        this.port = port;
+        this.PORT = port;
         this.controllerList = new ArrayList<>();
     }
 
@@ -49,7 +49,7 @@ public class HttpServer extends Thread {
                             .addLast("serverHandle", new HttpServerHandler(controllerList));
                 }
             });
-            serverChannel = b.bind(port).sync().channel();
+            serverChannel = b.bind(PORT).sync().channel();
             serverChannel.closeFuture().sync();
         } catch (Exception e) {
             log.error("{}", e.getMessage());
@@ -59,13 +59,16 @@ public class HttpServer extends Thread {
         }
     }
 
-    public HttpServer addController(Object obj) {
+    public void addController(Object obj) {
         this.controllerList.add(obj);
-        return this;
     }
 
     public void stopServer() {
-
+        if (serverChannel != null) {
+            log.info("close httpServer");
+            serverChannel.close();
+            serverChannel = null;
+        }
     }
 
 }

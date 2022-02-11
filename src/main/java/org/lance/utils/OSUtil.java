@@ -31,7 +31,8 @@ public class OSUtil {
                     }
                 }
             }
+            if (isPortsUsing) return true;
         }
-        return isPortsUsing;
+        return false;
     }
 }

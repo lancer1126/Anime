@@ -8,9 +8,9 @@ import org.lance.websocket.WebSocketServer;
 @Slf4j
 public abstract class AbstractApplication {
 
-    private static final int REST_PORT = 2333;
+    private static final int REST_PORT = 2233;
 
-    private static final int WEBSOCKET_PORT = 9090;
+    private static final int WEBSOCKET_PORT = 3322;
 
     protected abstract void setupServer();
 
