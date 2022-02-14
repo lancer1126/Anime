@@ -1,4 +1,4 @@
-package org.lance.http;
+package org.lance.network.http;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

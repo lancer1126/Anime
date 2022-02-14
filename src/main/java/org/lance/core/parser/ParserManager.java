@@ -1,7 +1,10 @@
-package org.lance.parser;
+package org.lance.core.parser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.lance.annotation.Parser;
+import org.lance.pojo.RequestHeader;
+import org.lance.pojo.entity.TaskInfo;
+import org.lance.pojo.entity.VideoInfo;
 import org.reflections.Reflections;
 
 import java.util.ArrayList;
@@ -16,7 +19,7 @@ import java.util.Set;
 @Slf4j
 public class ParserManager {
 
-    private static final String PARSER_PACKAGE_NAME = "org.lance.parser";
+    private static final String PARSER_PACKAGE_NAME = "org.lance.core.parser";
 
     private static final ParserManager INSTANCE = new ParserManager();
 
@@ -46,5 +49,14 @@ public class ParserManager {
                 });
         parserList = tempParserList;
         log.info("解析器加载完毕");
+    }
+
+    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) {
+        for (AbstractParser parser : parserList) {
+            if (parser.matchParser(videoInfo.getType())) {
+                return parser.buildTaskInfo(requestHeader, videoInfo);
+            }
+        }
+        return null;
     }
 }

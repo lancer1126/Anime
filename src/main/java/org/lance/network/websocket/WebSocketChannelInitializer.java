@@ -1,4 +1,4 @@
-package org.lance.websocket;
+package org.lance.network.websocket;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;

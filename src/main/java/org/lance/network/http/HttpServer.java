@@ -1,4 +1,4 @@
-package org.lance.http;
+package org.lance.network.http;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -20,7 +20,7 @@ public class HttpServer extends Thread {
 
     private final int PORT;
 
-    private List<Object> controllerList;
+    private final List<Object> controllerList;
 
     private static Channel serverChannel;
 

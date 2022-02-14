@@ -1,8 +1,8 @@
 package org.lance;
 
 import lombok.extern.slf4j.Slf4j;
-import org.lance.http.AbstractApplication;
-import org.lance.parser.ParserManager;
+import org.lance.network.http.AbstractApplication;
+import org.lance.core.parser.ParserManager;
 
 @Slf4j
 public class AnimeApplication extends AbstractApplication {

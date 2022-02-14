@@ -1,9 +1,9 @@
-package org.lance.http;
+package org.lance.network.http;
 
 import lombok.extern.slf4j.Slf4j;
 import org.lance.controller.AnimeController;
 import org.lance.utils.OSUtil;
-import org.lance.websocket.WebSocketServer;
+import org.lance.network.websocket.WebSocketServer;
 
 @Slf4j
 public abstract class AbstractApplication {
