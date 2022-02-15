@@ -1,4 +1,4 @@
-package org.lance.utils;
+package org.lance.common.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.*;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class HttpHandlerUtil {

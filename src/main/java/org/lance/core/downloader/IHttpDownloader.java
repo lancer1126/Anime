@@ -1,7 +1,7 @@
 package org.lance.core.downloader;
 
-import org.lance.constrants.enums.HttpDownStatus;
-import org.lance.pojo.entity.TaskInfo;
+import org.lance.common.constrants.enums.HttpDownStatus;
+import org.lance.domain.entity.TaskInfo;
 
 /**
  * 下载器母接口

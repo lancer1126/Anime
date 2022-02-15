@@ -1,4 +1,4 @@
-package org.lance.utils;
+package org.lance.common.utils;
 
 import java.net.ServerSocket;
 import java.util.Locale;

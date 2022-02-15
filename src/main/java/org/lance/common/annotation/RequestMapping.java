@@ -1,4 +1,4 @@
-package org.lance.annotation;
+package org.lance.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

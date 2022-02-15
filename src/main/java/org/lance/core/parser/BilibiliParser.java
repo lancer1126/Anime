@@ -2,18 +2,19 @@ package org.lance.core.parser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.lance.annotation.Parser;
-import org.lance.constrants.enums.Global;
+import org.lance.common.annotation.Parser;
+import org.lance.common.AnimeException;
+import org.lance.common.constrants.Global;
 import org.lance.core.BilibiliClientCore;
 import org.lance.core.downloader.DefaultHttpDownloader;
 import org.lance.network.http.model.Audio;
-import org.lance.network.http.model.PlayUrlM4SData;
+import org.lance.network.http.response.PlayUrlM4SDataResp;
 import org.lance.network.http.model.Video;
 import org.lance.network.http.view.VideoView;
-import org.lance.pojo.RequestHeader;
-import org.lance.pojo.entity.TaskInfo;
-import org.lance.pojo.entity.VideoInfo;
-import org.lance.utils.CommonUtil;
+import org.lance.domain.RequestHeader;
+import org.lance.domain.entity.TaskInfo;
+import org.lance.domain.entity.VideoInfo;
+import org.lance.common.utils.CommonUtil;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -34,12 +35,12 @@ public final class BilibiliParser extends AbstractParser {
     }
 
     @Override
-    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) {
+    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException {
         TaskInfo taskInfo = new TaskInfo();
         if (StringUtils.isNotBlank(videoInfo.getUrl())) {
             taskInfo.setUrl(videoInfo.getUrl());
         } else {
-            taskInfo.setUrl(getM4VideoUrl(videoInfo, requestHeader));
+            taskInfo.setUrl(getM4SVideoUrl(videoInfo, requestHeader));
         }
         taskInfo.setId(videoInfo.getId());
         taskInfo.setCoverImg(videoInfo.getCoverImg());
@@ -55,10 +56,10 @@ public final class BilibiliParser extends AbstractParser {
         return null;
     }
 
-    private String getM4VideoUrl(VideoInfo videoInfo, RequestHeader requestHeader) {
-        PlayUrlM4SData m4SData = BilibiliClientCore.getBilibiliClient().getM4SFormatVideoPlayUrl(videoInfo, requestHeader);
-        List<Video> videoList = m4SData.getDash().getVideo();
-        List<Audio> audioList = m4SData.getDash().getAudio();
+    private String getM4SVideoUrl(VideoInfo videoInfo, RequestHeader requestHeader) throws AnimeException {
+        PlayUrlM4SDataResp m4sData = BilibiliClientCore.getBilibiliClient().getM4SFormatVideoPlayUrl(videoInfo, requestHeader);
+        List<Video> videoList = m4sData.getDash().getVideo();
+        List<Audio> audioList = m4sData.getDash().getAudio();
 
         String videoUrl = videoList.stream()
                 .filter(video -> video.getId().equals(videoInfo.getQuality()))

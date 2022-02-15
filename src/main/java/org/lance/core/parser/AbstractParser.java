@@ -2,11 +2,12 @@ package org.lance.core.parser;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
+import org.lance.common.AnimeException;
 import org.lance.core.downloader.DefaultHttpDownloader;
 import org.lance.network.http.view.VideoView;
-import org.lance.pojo.RequestHeader;
-import org.lance.pojo.entity.TaskInfo;
-import org.lance.pojo.entity.VideoInfo;
+import org.lance.domain.RequestHeader;
+import org.lance.domain.entity.TaskInfo;
+import org.lance.domain.entity.VideoInfo;
 
 import java.util.regex.Pattern;
 
@@ -17,7 +18,7 @@ public abstract class AbstractParser {
 
     public abstract VideoView parse(String url, RequestHeader requestHeader);
 
-    public abstract TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo);
+    public abstract TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException;
 
     public abstract DefaultHttpDownloader buildDownloader(RequestHeader requestHeader, TaskInfo taskInfo);
 

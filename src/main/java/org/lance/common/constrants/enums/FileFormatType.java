@@ -1,4 +1,4 @@
-package org.lance.constrants.enums;
+package org.lance.common.constrants.enums;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

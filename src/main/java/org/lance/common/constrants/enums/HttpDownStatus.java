@@ -1,4 +1,4 @@
-package org.lance.constrants.enums;
+package org.lance.common.constrants.enums;
 
 /**
  * 下载器状态枚举类

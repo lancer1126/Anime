@@ -1,4 +1,4 @@
-package org.lance.utils;
+package org.lance.common.utils;
 
 import org.apache.commons.lang3.RandomStringUtils;
 

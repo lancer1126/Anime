@@ -1,4 +1,4 @@
-package org.lance.constrants.enums;
+package org.lance.common.constrants;
 
 public class Global {
 

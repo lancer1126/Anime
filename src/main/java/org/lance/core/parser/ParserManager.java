@@ -1,10 +1,11 @@
 package org.lance.core.parser;
 
 import lombok.extern.slf4j.Slf4j;
-import org.lance.annotation.Parser;
-import org.lance.pojo.RequestHeader;
-import org.lance.pojo.entity.TaskInfo;
-import org.lance.pojo.entity.VideoInfo;
+import org.lance.common.AnimeException;
+import org.lance.common.annotation.Parser;
+import org.lance.domain.RequestHeader;
+import org.lance.domain.entity.TaskInfo;
+import org.lance.domain.entity.VideoInfo;
 import org.reflections.Reflections;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class ParserManager {
         log.info("解析器加载完毕");
     }
 
-    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) {
+    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException {
         for (AbstractParser parser : parserList) {
             if (parser.matchParser(videoInfo.getType())) {
                 return parser.buildTaskInfo(requestHeader, videoInfo);

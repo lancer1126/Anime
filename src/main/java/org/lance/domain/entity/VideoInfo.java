@@ -1,7 +1,7 @@
-package org.lance.pojo.entity;
+package org.lance.domain.entity;
 
 import lombok.Data;
-import org.lance.constrants.enums.FileFormatType;
+import org.lance.common.constrants.enums.FileFormatType;
 import org.lance.core.parser.AbstractParser;
 
 @Data

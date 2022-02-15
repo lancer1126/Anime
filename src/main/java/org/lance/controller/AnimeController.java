@@ -6,14 +6,17 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.lance.annotation.RequestMapping;
 import org.lance.common.ResultEntity;
+import org.lance.common.annotation.RequestMapping;
+import org.lance.common.constrants.enums.HttpDownStatus;
+import org.lance.common.constrants.enums.MessageType;
+import org.lance.common.utils.HttpHandlerUtil;
+import org.lance.core.MessageCore;
 import org.lance.core.downloader.DownloaderManager;
 import org.lance.core.parser.ParserManager;
-import org.lance.pojo.RequestHeader;
-import org.lance.pojo.entity.TaskInfo;
-import org.lance.pojo.entity.VideoInfo;
-import org.lance.utils.HttpHandlerUtil;
+import org.lance.domain.RequestHeader;
+import org.lance.domain.entity.TaskInfo;
+import org.lance.domain.entity.VideoInfo;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +48,7 @@ public class AnimeController {
                     taskInfo = new TaskInfo();
                     taskInfo.setId(videoInfo.getId());
                 }
-                // todo 传递处理错误的信息
+                MessageCore.send(MessageType.CALL_BACK, HttpDownStatus.FAIL, e.getMessage(), taskInfo);
             }
         }
 
@@ -54,7 +57,7 @@ public class AnimeController {
             try {
                 DownloaderManager.getInstance().start(taskInfo, requestHeader);
             } catch (Exception e) {
-                // todo 传递错误信息
+                MessageCore.send(MessageType.CALL_BACK, HttpDownStatus.FAIL, e.getMessage(), taskInfo);
             }
         }
         return HttpHandlerUtil.buildJson(ResultEntity.success());

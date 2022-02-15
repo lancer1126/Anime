@@ -1,4 +1,4 @@
-package org.lance.pojo.entity;
+package org.lance.domain.entity;
 
 import lombok.Data;
 

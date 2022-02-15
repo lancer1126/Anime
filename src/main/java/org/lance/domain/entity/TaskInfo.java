@@ -1,11 +1,10 @@
-package org.lance.pojo.entity;
+package org.lance.domain.entity;
 
 import lombok.Data;
-import org.lance.constrants.enums.FileFormatType;
+import org.lance.common.constrants.enums.FileFormatType;
 import org.lance.core.downloader.DefaultHttpDownloader;
 import org.lance.core.parser.AbstractParser;
-import org.lance.core.parser.ParserManager;
-import org.lance.pojo.RequestHeader;
+import org.lance.domain.RequestHeader;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
