@@ -9,6 +9,8 @@ import org.lance.domain.entity.TaskInfo;
 import org.lance.network.websocket.ClientCallback;
 
 import java.util.*;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -26,16 +28,18 @@ public class MessageCore {
 
     private static final MessageCore INSTANCE = new MessageCore();
 
+    private ScheduledFuture<?> messageSendTimer;
+
     public static MessageCore getInstance() {
         return INSTANCE;
     }
 
     public void init() {
-        // todo 初始化消息发送类
+        loadMessageSendTimer();
     }
 
     public void stop() {
-
+        ThreadContext.shutdown(messageSendTimer);
     }
 
     public static void send(Message message) {
@@ -63,6 +67,10 @@ public class MessageCore {
         ClientCallback.push(message);
     }
 
+    private void loadMessageSendTimer() {
+        this.messageSendTimer = ThreadContext.timer(new MessageSendTimer(), 5, 3, TimeUnit.SECONDS);
+    }
+
     private static Message createMessage(MessageType type, HttpDownStatus status, String msg, TaskInfo taskInfo) {
         Message message = new Message();
         message.setType(type.getType());
@@ -79,5 +87,18 @@ public class MessageCore {
         msgData.setCover(taskInfo.getCoverImg());
         message.setData(msgData);
         return message;
+    }
+
+    private static class MessageSendTimer implements Runnable {
+        @Override
+        public void run() {
+            if (callbackMessageList.isEmpty()) {
+                return;
+            }
+            log.info("callbackMessageList: " + callbackMessageList);
+            for (Message message : callbackMessageList) {
+                send(message);
+            }
+        }
     }
 }
