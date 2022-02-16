@@ -10,16 +10,8 @@ import org.lance.core.parser.ParserManager;
 @Slf4j
 public class AnimeApplication extends AbstractApplication {
 
-    private static AnimeApplication animeApplication;
-
     public static void main(String[] args) {
-        animeApplication = new AnimeApplication();
-        try {
-            animeApplication.start();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        new AnimeApplication().start();
     }
 
     @Override
@@ -28,8 +20,8 @@ public class AnimeApplication extends AbstractApplication {
         setupWebSocketServer();
         ParserManager.getInstance().init();
         DownloaderManager.getInstance().init();
-        BilibiliClientCore.init();
         MessageCore.getInstance().init();
+        BilibiliClientCore.init();
     }
 
     @Override
@@ -37,9 +29,5 @@ public class AnimeApplication extends AbstractApplication {
         super.stopServer();
         DownloaderManager.getInstance().stop();
         MessageCore.getInstance().stop();
-    }
-
-    public static AnimeApplication animeApplication() {
-        return animeApplication;
     }
 }

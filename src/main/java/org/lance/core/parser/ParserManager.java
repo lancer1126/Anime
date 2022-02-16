@@ -22,12 +22,11 @@ public class ParserManager {
 
     private static final String PARSER_PACKAGE_NAME = "org.lance.core.parser";
 
-    private static final ParserManager INSTANCE = new ParserManager();
-
     private List<AbstractParser> parserList = new ArrayList<>();
 
     public static ParserManager getInstance() {
-        return INSTANCE;
+        // 静态内部类创建单例
+        return ParserManagerHolder.INSTANCE;
     }
 
     public void init() {
@@ -59,5 +58,9 @@ public class ParserManager {
             }
         }
         return null;
+    }
+
+    private static class ParserManagerHolder {
+        private static final ParserManager INSTANCE = new ParserManager();
     }
 }

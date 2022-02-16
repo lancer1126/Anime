@@ -7,10 +7,8 @@ import org.lance.domain.entity.TaskInfo;
 @Slf4j
 public class DownloaderManager {
 
-    private static final DownloaderManager INSTANCE = new DownloaderManager();
-
     public static DownloaderManager getInstance() {
-        return INSTANCE;
+        return DownloaderManagerHolder.INSTANCE;
     }
 
     public void init() {
@@ -23,5 +21,9 @@ public class DownloaderManager {
 
     public void stop() {
 
+    }
+
+    private static class DownloaderManagerHolder {
+        private static final DownloaderManager INSTANCE = new DownloaderManager();
     }
 }

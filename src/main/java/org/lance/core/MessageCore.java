@@ -26,12 +26,10 @@ public class MessageCore {
     private static final Map<String, Map<String, Message>> taskIdMessageMap = new HashMap<>();
     private static final LinkedList<Message> callbackMessageList = new LinkedList<>();
 
-    private static final MessageCore INSTANCE = new MessageCore();
-
     private ScheduledFuture<?> messageSendTimer;
 
     public static MessageCore getInstance() {
-        return INSTANCE;
+        return MessageCoreHolder.INSTANCE;
     }
 
     public void init() {
@@ -100,5 +98,9 @@ public class MessageCore {
                 send(message);
             }
         }
+    }
+
+    private static class MessageCoreHolder {
+        private static final MessageCore INSTANCE = new MessageCore();
     }
 }

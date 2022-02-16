@@ -19,9 +19,14 @@ public abstract class AbstractApplication {
     private WebSocketServer webSocketServer;
 
     public void start() {
-        checkPort();
-        setupServer();
-        startServer();
+        try {
+            checkPort();
+            setupServer();
+            startServer();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private static void checkPort() {
