@@ -6,6 +6,7 @@ import org.lance.common.annotation.Parser;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;
 import org.lance.domain.entity.VideoInfo;
+import org.lance.network.http.view.VideoView;
 import org.reflections.Reflections;
 
 import java.util.ArrayList;
@@ -51,13 +52,27 @@ public class ParserManager {
         log.info("解析器加载完毕");
     }
 
-    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException {
+    public VideoView parse(String url, RequestHeader reqHeader) {
+        VideoView videoView = null;
         for (AbstractParser parser : parserList) {
-            if (parser.matchParser(videoInfo.getType())) {
-                return parser.buildTaskInfo(requestHeader, videoInfo);
+            // 遍历所有的Parser，通过url匹配到相应的Parser
+            if (parser.matchParser(url)) {
+                videoView = parser.parse(url, reqHeader);
+                break;
             }
         }
-        return null;
+        return videoView;
+    }
+
+    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException {
+        TaskInfo taskInfo = null;
+        for (AbstractParser parser : parserList) {
+            if (parser.matchParser(videoInfo.getType())) {
+                taskInfo = parser.buildTaskInfo(requestHeader, videoInfo);
+                break;
+            }
+        }
+        return taskInfo;
     }
 
     private static class ParserManagerHolder {

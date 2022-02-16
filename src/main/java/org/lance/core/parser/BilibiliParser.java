@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.lance.common.annotation.Parser;
 import org.lance.common.AnimeException;
 import org.lance.common.constrants.Global;
+import org.lance.common.constrants.enums.Type;
 import org.lance.core.BilibiliClientCore;
 import org.lance.core.downloader.DefaultHttpDownloader;
 import org.lance.network.http.model.Audio;
@@ -15,6 +16,8 @@ import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;
 import org.lance.domain.entity.VideoInfo;
 import org.lance.common.utils.CommonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -24,6 +27,9 @@ import java.util.regex.Pattern;
 public final class BilibiliParser extends AbstractParser {
 
     private static final Pattern BV_PATTERN = Pattern.compile("BV([0-9A-Za-z]+)");
+    private static final Pattern SS_PATTERN = Pattern.compile("ss([0-9]+)");
+    private static final Pattern MD_PATTERN = Pattern.compile("md([0-9]+)");
+    private static final Pattern EP_PATTERN = Pattern.compile("ep([0-9]+)");
 
     public BilibiliParser() {
         super(Type.BILIBILI);
@@ -31,6 +37,7 @@ public final class BilibiliParser extends AbstractParser {
 
     @Override
     public VideoView parse(String url, RequestHeader requestHeader) {
+        // todo 根据url解析视频下载地址
         return null;
     }
 

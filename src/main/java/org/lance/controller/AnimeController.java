@@ -1,7 +1,6 @@
 package org.lance.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.TypeReference;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -10,6 +9,7 @@ import org.lance.common.ResultEntity;
 import org.lance.common.annotation.RequestMapping;
 import org.lance.common.constrants.enums.HttpDownStatus;
 import org.lance.common.constrants.enums.MessageType;
+import org.lance.common.utils.CommonUtil;
 import org.lance.common.utils.HttpHandlerUtil;
 import org.lance.core.MessageCore;
 import org.lance.core.downloader.DownloaderManager;
@@ -17,6 +17,7 @@ import org.lance.core.parser.ParserManager;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;
 import org.lance.domain.entity.VideoInfo;
+import org.lance.network.http.view.VideoView;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,11 +30,32 @@ import java.util.Map;
 @RequestMapping("/anime")
 public class AnimeController {
 
+    public FullHttpResponse parse(Channel channel, FullHttpRequest request) {
+        String requestContent = request.content().toString(StandardCharsets.UTF_8);
+        Map<String, String> paramMap = CommonUtil.parseJSONToEntity(requestContent, new TypeReference<>() {});
+
+        try {
+            HashMap<String, String> headers = CommonUtil.parseJSONToEntity(paramMap.get("headers"), new TypeReference<>() {});
+            RequestHeader reqHeader = new RequestHeader(headers);
+
+            VideoView videoView = ParserManager.getInstance().parse(paramMap.get("search"), reqHeader);
+            if (videoView == null) {
+                return HttpHandlerUtil.buildJson(ResultEntity.error("解析失败"));
+            } else {
+                return HttpHandlerUtil.buildJson(ResultEntity.success(videoView));
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return HttpHandlerUtil.buildJson(ResultEntity.error("解析失败"));
+        }
+    }
+
     @RequestMapping("/download")
     public FullHttpResponse download(Channel channel, FullHttpRequest request) throws IOException {
-        Map<String, String> paramMap = parseRequestToMap(request);
-        HashMap<String, String> headers = getJSONParams(paramMap.get("headers"), new TypeReference<>() {});
-        List<VideoInfo> videoInfoList = getJSONParams(paramMap.get("videoInfoList"), new TypeReference<>() {});
+        String requestContent = request.content().toString(StandardCharsets.UTF_8);
+        Map<String, String> paramMap = CommonUtil.parseJSONToEntity(requestContent, new TypeReference<>() {});
+        HashMap<String, String> headers = CommonUtil.parseJSONToEntity(paramMap.get("headers"), new TypeReference<>() {});
+        List<VideoInfo> videoInfoList = CommonUtil.parseJSONToEntity(paramMap.get("videoInfoList"), new TypeReference<>() {});
 
         RequestHeader requestHeader = new RequestHeader(headers);
         List<TaskInfo> taskInfoList = new ArrayList<>();
@@ -61,14 +83,5 @@ public class AnimeController {
             }
         }
         return HttpHandlerUtil.buildJson(ResultEntity.success());
-    }
-
-    private Map<String, String> parseRequestToMap(FullHttpRequest request) throws IOException {
-        return getJSONParams(request.content().toString(StandardCharsets.UTF_8), new TypeReference<>() {});
-    }
-
-    private <T> T getJSONParams(Object obj, TypeReference<T> clazzList) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(objectMapper.writeValueAsString(obj), clazzList);
     }
 }

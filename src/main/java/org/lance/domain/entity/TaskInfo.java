@@ -2,8 +2,8 @@ package org.lance.domain.entity;
 
 import lombok.Data;
 import org.lance.common.constrants.enums.FileFormatType;
+import org.lance.common.constrants.enums.Type;
 import org.lance.core.downloader.DefaultHttpDownloader;
-import org.lance.core.parser.AbstractParser;
 import org.lance.domain.RequestHeader;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class TaskInfo {
     private String coverImg;
     private String name;
     private String url;
-    private AbstractParser.Type type;
+    private Type type;
     private FileFormatType fileType;
     private String filePath;
     private AtomicLong currentOffset = new AtomicLong(0);

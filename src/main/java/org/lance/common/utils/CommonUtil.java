@@ -1,9 +1,12 @@
 package org.lance.common.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class CommonUtil {
@@ -23,5 +26,9 @@ public class CommonUtil {
             content = content.substring(1);
         }
         return content;
+    }
+
+    public static <T> T parseJSONToEntity(String jsonStr, TypeReference<T> typeReference) {
+        return JSON.parseObject(jsonStr, typeReference);
     }
 }

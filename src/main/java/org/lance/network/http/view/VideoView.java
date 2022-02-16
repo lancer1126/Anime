@@ -1,7 +1,7 @@
 package org.lance.network.http.view;
 
 import org.lance.common.constrants.enums.FileFormatType;
-import org.lance.core.parser.AbstractParser;
+import org.lance.common.constrants.enums.Type;
 
 import java.util.*;
 
@@ -9,7 +9,7 @@ public class VideoView {
     public String id;
     // in bilibili: (bvId + cId) get a video detail
     public Integer cId;
-    public AbstractParser.Type type;
+    public Type type;
     public FileFormatType fileType;
     public Map<String, String> headers;
     public String title;
