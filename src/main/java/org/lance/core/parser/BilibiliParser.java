@@ -17,10 +17,7 @@ import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;
 import org.lance.domain.entity.VideoInfo;
 import org.lance.network.http.bilibili.BiliHttpHeaders;
-import org.lance.network.http.model.Audio;
-import org.lance.network.http.model.Page;
-import org.lance.network.http.model.Video;
-import org.lance.network.http.model.VideoData;
+import org.lance.network.http.model.*;
 import org.lance.network.http.response.BilibiliVideoResp;
 import org.lance.network.http.response.PlayUrlM4SDataResp;
 import org.lance.network.http.view.SubVideoView;
@@ -96,8 +93,8 @@ public final class BilibiliParser extends AbstractParser {
 
     private String getM4SVideoUrl(VideoInfo videoInfo, RequestHeader requestHeader) throws AnimeException {
         PlayUrlM4SDataResp m4sData = BilibiliClientCore.getBilibiliClient().getM4SFormatVideoPlayUrl(videoInfo, requestHeader);
-        List<Video> videoList = m4sData.getDash().getVideo();
-        List<Audio> audioList = m4sData.getDash().getAudio();
+        List<Video> videoList = m4sData.getData().getDash().getVideo();
+        List<Audio> audioList = m4sData.getData().getDash().getAudio();
 
         String videoUrl = videoList.stream()
                 .filter(video -> video.getId().equals(videoInfo.getQuality()))
@@ -120,14 +117,14 @@ public final class BilibiliParser extends AbstractParser {
         reqHeader.setHeaders(headers);
 
         BilibiliVideoResp videoResp = BilibiliClientCore.getBilibiliClient().getVideoInfo(bvId, reqHeader);
-        VideoView videoView = parseToBaseVideoInfo(videoResp.getVideoData());
+        VideoView videoView = parseToBaseVideoInfo(videoResp.getData());
         videoView.type = this.type();
         videoView.fileType = FileFormatType.M4S;
         videoView.headers = reqHeader.getHeaders();
 
         PlayUrlM4SDataResp m4SDataResp = BilibiliClientCore.getBilibiliClient()
                 .getM4SFormatVideoPlayUrl(new VideoInfo(bvId, videoView.cId), reqHeader);
-        parseM4sDetailVideoInfo(videoView, m4SDataResp);
+        parseM4sDetailVideoInfo(videoView, m4SDataResp.getData());
         return videoView;
     }
 
@@ -152,7 +149,7 @@ public final class BilibiliParser extends AbstractParser {
         return videoInfo;
     }
 
-    private void parseM4sDetailVideoInfo(VideoView videoView, PlayUrlM4SDataResp playUrlM4SData) {
+    private void parseM4sDetailVideoInfo(VideoView videoView, PlayUrlM4SData playUrlM4SData) {
         List<String> acceptDescriptions = playUrlM4SData.getAcceptDescription();
         List<Integer> acceptQualities = playUrlM4SData.getAcceptQuality();
         Collections.reverse(acceptDescriptions);
@@ -165,7 +162,7 @@ public final class BilibiliParser extends AbstractParser {
         videoView.audioUrl = playUrlM4SData.getDash().getAudio().get(0).getBaseUrl();
         videoView.dashVideoMap = playUrlM4SData.getDash().getVideo().stream()
                 .filter(e -> e.getId() != null)
-                .collect(Collectors.toMap(Video::getId, Video::getBaseUrl));
+                .collect(Collectors.toMap(Video::getId, Video::getBaseUrl, (oldVal, newVal) -> newVal));
     }
 
     private BilibiliType checkBiliType(String ptnStr) {

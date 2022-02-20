@@ -5,5 +5,5 @@ import org.lance.network.http.model.VideoData;
 
 @Data
 public class BilibiliVideoResp extends GenericResponse{
-    private VideoData videoData;
+    private VideoData data;
 }

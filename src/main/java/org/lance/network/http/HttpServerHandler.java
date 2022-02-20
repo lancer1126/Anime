@@ -49,7 +49,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         ctx.channel().writeAndFlush(httpResponse);
     }
 
-
     public FullHttpResponse invoke(String uri, Channel channel, FullHttpRequest request) throws InvocationTargetException, IllegalAccessException {
         if (controllerList == null) {
             return HttpHandlerUtil.buildJson(ResultEntity.error(404, "not found"));
