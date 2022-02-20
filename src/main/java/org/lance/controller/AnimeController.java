@@ -7,8 +7,8 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.lance.common.ResultEntity;
 import org.lance.common.annotation.RequestMapping;
-import org.lance.common.constrants.enums.HttpDownStatus;
-import org.lance.common.constrants.enums.MessageType;
+import org.lance.common.enums.HttpDownStatus;
+import org.lance.common.enums.MessageType;
 import org.lance.common.utils.CommonUtil;
 import org.lance.common.utils.HttpHandlerUtil;
 import org.lance.core.MessageCore;
@@ -30,6 +30,7 @@ import java.util.Map;
 @RequestMapping("/anime")
 public class AnimeController {
 
+    @RequestMapping("/parse")
     public FullHttpResponse parse(Channel channel, FullHttpRequest request) {
         String requestContent = request.content().toString(StandardCharsets.UTF_8);
         Map<String, String> paramMap = CommonUtil.parseJSONToEntity(requestContent, new TypeReference<>() {});

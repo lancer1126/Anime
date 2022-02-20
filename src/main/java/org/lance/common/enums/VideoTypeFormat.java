@@ -1,4 +1,4 @@
-package org.lance.common.constrants.enums;
+package org.lance.common.enums;
 
 public enum VideoTypeFormat {
     M4S(16),

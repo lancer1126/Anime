@@ -1,6 +1,6 @@
 package org.lance.core.downloader;
 
-import org.lance.common.constrants.enums.HttpDownStatus;
+import org.lance.common.enums.HttpDownStatus;
 import org.lance.domain.entity.TaskInfo;
 
 /**

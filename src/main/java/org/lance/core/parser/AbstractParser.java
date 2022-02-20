@@ -2,7 +2,7 @@ package org.lance.core.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.lance.common.AnimeException;
-import org.lance.common.constrants.enums.Type;
+import org.lance.common.enums.Type;
 import org.lance.core.downloader.DefaultHttpDownloader;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;

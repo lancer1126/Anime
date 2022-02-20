@@ -1,7 +1,7 @@
 package org.lance.network.http.view;
 
-import org.lance.common.constrants.enums.FileFormatType;
-import org.lance.common.constrants.enums.Type;
+import org.lance.common.enums.FileFormatType;
+import org.lance.common.enums.Type;
 
 import java.util.*;
 

@@ -1,8 +1,8 @@
 package org.lance.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.lance.common.constrants.enums.HttpDownStatus;
-import org.lance.common.constrants.enums.MessageType;
+import org.lance.common.enums.HttpDownStatus;
+import org.lance.common.enums.MessageType;
 import org.lance.domain.Message;
 import org.lance.domain.MessageData;
 import org.lance.domain.entity.TaskInfo;

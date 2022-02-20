@@ -3,14 +3,15 @@ package org.lance.domain;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class RequestHeader {
-    HashMap<String, String> headers;
+    Map<String, String> headers;
 
     public RequestHeader() {};
 
-    public RequestHeader(HashMap<String, String> headers) {
+    public RequestHeader(Map<String, String> headers) {
         this.headers = headers;
     }
 }

@@ -1,8 +1,8 @@
 package org.lance.domain.entity;
 
 import lombok.Data;
-import org.lance.common.constrants.enums.FileFormatType;
-import org.lance.common.constrants.enums.Type;
+import org.lance.common.enums.FileFormatType;
+import org.lance.common.enums.Type;
 import org.lance.core.downloader.DefaultHttpDownloader;
 import org.lance.domain.RequestHeader;
 

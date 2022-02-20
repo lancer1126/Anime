@@ -1,9 +1,8 @@
 package org.lance.domain.entity;
 
 import lombok.Data;
-import org.lance.common.constrants.enums.FileFormatType;
-import org.lance.common.constrants.enums.Type;
-import org.lance.core.parser.AbstractParser;
+import org.lance.common.enums.FileFormatType;
+import org.lance.common.enums.Type;
 
 @Data
 public class VideoInfo {
@@ -18,4 +17,10 @@ public class VideoInfo {
     private String savePath;
     private String coverImg;
     private Long totalSize;
+
+    public VideoInfo() {}
+    public VideoInfo(String bId, Integer cId) {
+        this.bId = bId;
+        this.cId = cId;
+    }
 }

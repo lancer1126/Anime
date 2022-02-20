@@ -1,44 +1,75 @@
 package org.lance.core.parser;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.lance.common.annotation.Parser;
 import org.lance.common.AnimeException;
+import org.lance.common.annotation.Parser;
 import org.lance.common.constrants.Global;
-import org.lance.common.constrants.enums.Type;
+import org.lance.common.enums.BilibiliType;
+import org.lance.common.enums.FileFormatType;
+import org.lance.common.enums.Type;
+import org.lance.common.utils.CommonUtil;
+import org.lance.common.utils.ConvertUtil;
 import org.lance.core.BilibiliClientCore;
 import org.lance.core.downloader.DefaultHttpDownloader;
-import org.lance.network.http.model.Audio;
-import org.lance.network.http.response.PlayUrlM4SDataResp;
-import org.lance.network.http.model.Video;
-import org.lance.network.http.view.VideoView;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;
 import org.lance.domain.entity.VideoInfo;
-import org.lance.common.utils.CommonUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.lance.network.http.bilibili.BiliHttpHeaders;
+import org.lance.network.http.model.Audio;
+import org.lance.network.http.model.Page;
+import org.lance.network.http.model.Video;
+import org.lance.network.http.model.VideoData;
+import org.lance.network.http.response.BilibiliVideoResp;
+import org.lance.network.http.response.PlayUrlM4SDataResp;
+import org.lance.network.http.view.SubVideoView;
+import org.lance.network.http.view.VideoView;
 
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Parser(name = "bilibili")
 public final class BilibiliParser extends AbstractParser {
 
-    private static final Pattern BV_PATTERN = Pattern.compile("BV([0-9A-Za-z]+)");
-    private static final Pattern SS_PATTERN = Pattern.compile("ss([0-9]+)");
-    private static final Pattern MD_PATTERN = Pattern.compile("md([0-9]+)");
-    private static final Pattern EP_PATTERN = Pattern.compile("ep([0-9]+)");
+    private static final String AV_PATTERN = "av([0-9]+)";
+    private static final String BV_PATTERN = "BV([0-9A-Za-z]+)";
+    private static final String SS_PATTERN = "ss([0-9]+)";
+    private static final String MD_PATTERN = "md([0-9]+)";
+    private static final String EP_PATTERN = "ep([0-9]+)";
 
     public BilibiliParser() {
         super(Type.BILIBILI);
     }
 
+    @SneakyThrows
     @Override
-    public VideoView parse(String url, RequestHeader requestHeader) {
-        // todo 根据url解析视频下载地址
-        return null;
+    public VideoView parse(String url, RequestHeader reqtHeader) {
+        log.info("parsing Bilibili Video...");
+        String videoId;
+        VideoView videoView = null;
+        try {
+            for (String ptnStr : Arrays.asList(AV_PATTERN, BV_PATTERN, SS_PATTERN, MD_PATTERN, EP_PATTERN)) {
+                Matcher matcher = Pattern.compile(ptnStr).matcher(url);
+                if (matcher.find()) {
+                    if (ptnStr.equals(BV_PATTERN)) {
+                        videoId = matcher.group();
+                    } else {
+                        videoId = matcher.group(1);
+                    }
+                    BilibiliType videoType = checkBiliType(ptnStr);
+                    if (videoType == null) continue;
+                    videoView = checkVideoInfo(videoId, videoType, reqtHeader);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            throw new AnimeException(-1, "Parsing Url Error!");
+        }
+        return videoView;
     }
 
     @Override
@@ -74,5 +105,104 @@ public final class BilibiliParser extends AbstractParser {
                 .map(Video::getBaseUrl)
                 .orElse("");
         return String.join(Global.URL_SEPARATOR + videoUrl + audioList.get(0).getBaseUrl());
+    }
+
+    private VideoView getBVVideoInfoWithM4S(String bvId, RequestHeader reqHeader) throws AnimeException {
+        Map<String, String> headers = reqHeader.getHeaders();
+        if (headers == null) {
+            headers = BiliHttpHeaders.getBilibiliM4sHeaders(bvId);
+        } else {
+            Map<String, String> biliM4SHeaders = BiliHttpHeaders.getBilibiliM4sHeaders(bvId);
+            for (Map.Entry<String, String> entry : biliM4SHeaders.entrySet()) {
+                headers.putIfAbsent(entry.getKey(), entry.getValue());
+            }
+        }
+        reqHeader.setHeaders(headers);
+
+        BilibiliVideoResp videoResp = BilibiliClientCore.getBilibiliClient().getVideoInfo(bvId, reqHeader);
+        VideoView videoView = parseToBaseVideoInfo(videoResp.getVideoData());
+        videoView.type = this.type();
+        videoView.fileType = FileFormatType.M4S;
+        videoView.headers = reqHeader.getHeaders();
+
+        PlayUrlM4SDataResp m4SDataResp = BilibiliClientCore.getBilibiliClient()
+                .getM4SFormatVideoPlayUrl(new VideoInfo(bvId, videoView.cId), reqHeader);
+        parseM4sDetailVideoInfo(videoView, m4SDataResp);
+        return videoView;
+    }
+
+    private VideoView parseToBaseVideoInfo(VideoData data) {
+        VideoView videoInfo = new VideoView();
+        videoInfo.id = data.getBvid();
+        videoInfo.cId = data.getCid();
+        videoInfo.title = data.getTitle();
+        videoInfo.description = data.getDesc();
+        videoInfo.preViewUrl = data.getPic();
+        videoInfo.author = data.getOwner().getName();
+
+        List<SubVideoView> list = new ArrayList<>();
+        for (Page page : data.getPages()) {
+            SubVideoView subVideoInfo = new SubVideoView();
+            subVideoInfo.bvId = data.getBvid();
+            subVideoInfo.cid = page.getCid();
+            subVideoInfo.name = page.getPart();
+            list.add(subVideoInfo);
+        }
+        videoInfo.subVideoInfos = list;
+        return videoInfo;
+    }
+
+    private void parseM4sDetailVideoInfo(VideoView videoView, PlayUrlM4SDataResp playUrlM4SData) {
+        List<String> acceptDescriptions = playUrlM4SData.getAcceptDescription();
+        List<Integer> acceptQualities = playUrlM4SData.getAcceptQuality();
+        Collections.reverse(acceptDescriptions);
+        Collections.reverse(acceptQualities);
+
+        for (int i = 0; i < acceptDescriptions.size(); i++) {
+            videoView.acceptDescription.put(acceptDescriptions.get(i), acceptQualities.get(i));
+        }
+
+        videoView.audioUrl = playUrlM4SData.getDash().getAudio().get(0).getBaseUrl();
+        videoView.dashVideoMap = playUrlM4SData.getDash().getVideo().stream()
+                .filter(e -> e.getId() != null)
+                .collect(Collectors.toMap(Video::getId, Video::getBaseUrl));
+    }
+
+    private BilibiliType checkBiliType(String ptnStr) {
+        switch (ptnStr) {
+            case AV_PATTERN:
+                return BilibiliType.AV;
+            case BV_PATTERN:
+                return BilibiliType.BV;
+            case SS_PATTERN:
+                return BilibiliType.SS;
+            case MD_PATTERN:
+                return BilibiliType.MD;
+            case EP_PATTERN:
+                return BilibiliType.EP;
+            default:
+                break;
+        }
+        return null;
+    }
+
+    private VideoView checkVideoInfo(String videoId, BilibiliType type, RequestHeader reqHeader) throws AnimeException {
+        VideoView videoView = null;
+        switch (type) {
+            case AV:
+                String bvId = ConvertUtil.Av2Bv(videoId);
+                videoView = getBVVideoInfoWithM4S(bvId, reqHeader);
+                break;
+            case BV:
+                videoView = getBVVideoInfoWithM4S(videoId, reqHeader);
+                break;
+            case SS:
+                break;
+            case MD:
+                break;
+            case EP:
+                break;
+        }
+        return videoView;
     }
 }

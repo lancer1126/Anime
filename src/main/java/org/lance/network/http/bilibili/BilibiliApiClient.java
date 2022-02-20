@@ -5,10 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.lance.common.AnimeException;
 import org.lance.common.constrants.ApiConfig;
-import org.lance.common.constrants.enums.VideoTypeFormat;
+import org.lance.common.enums.VideoTypeFormat;
 import org.lance.network.http.common.DefaultServiceClient;
 import org.lance.network.http.common.RequestMessage;
 import org.lance.network.http.common.ResponseMessage;
+import org.lance.network.http.response.BilibiliVideoResp;
 import org.lance.network.http.response.GenericResponse;
 import org.lance.network.http.response.PlayUrlM4SDataResp;
 import org.lance.network.http.response.ResponseCode;
@@ -29,6 +30,14 @@ public class BilibiliApiClient {
     public PlayUrlM4SDataResp getM4SFormatVideoPlayUrl(VideoInfo videoInfo, RequestHeader requestHeader) throws AnimeException {
         String url = String.format(ApiConfig.BILIBILI_PLAYURL, videoInfo.getBId(), videoInfo.getCId(), VideoTypeFormat.M4S.getValue(), "");
         return doRequest(url, requestHeader, PlayUrlM4SDataResp.class);
+    }
+
+    /**
+     * 获根据视频bv号获取相关view信息
+     */
+    public BilibiliVideoResp getVideoInfo(String bvId, RequestHeader reqHeader) throws AnimeException {
+        String url = String.format(ApiConfig.BILIBILI_VIEW, bvId);
+        return doRequest(url, reqHeader, BilibiliVideoResp.class);
     }
 
     protected <T extends GenericResponse> T doRequest(String url, RequestHeader requestHeader, Class<T> clazz) throws AnimeException {
