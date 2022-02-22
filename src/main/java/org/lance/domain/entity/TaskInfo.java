@@ -27,8 +27,4 @@ public class TaskInfo {
     private long speed;
     private int connectionCount;
     private List<ChunkInfo> chunkInfoList;
-
-    public DefaultHttpDownloader buildDownloader(RequestHeader requestHeader) {
-        return null;
-    }
 }

@@ -27,7 +27,7 @@ public class BilibiliApiClient {
         this.serviceClient = new DefaultServiceClient();
     }
 
-    public PlayUrlM4SDataResp getM4SFormatVideoPlayUrl(VideoInfo videoInfo, RequestHeader requestHeader) throws AnimeException {
+    public PlayUrlM4SDataResp getM4SFormatVideoPlayUrl(VideoInfo videoInfo, RequestHeader requestHeader) {
         String url = String.format(ApiConfig.BILIBILI_PLAYURL, videoInfo.getBId(), videoInfo.getCId(), VideoTypeFormat.M4S.getValue(), "");
         return doRequest(url, requestHeader, PlayUrlM4SDataResp.class);
     }
@@ -35,12 +35,12 @@ public class BilibiliApiClient {
     /**
      * 获根据视频bv号获取相关view信息
      */
-    public BilibiliVideoResp getVideoInfo(String bvId, RequestHeader reqHeader) throws AnimeException {
+    public BilibiliVideoResp getVideoInfo(String bvId, RequestHeader reqHeader) {
         String url = String.format(ApiConfig.BILIBILI_VIEW, bvId);
         return doRequest(url, reqHeader, BilibiliVideoResp.class);
     }
 
-    protected <T extends GenericResponse> T doRequest(String url, RequestHeader requestHeader, Class<T> clazz) throws AnimeException {
+    protected <T extends GenericResponse> T doRequest(String url, RequestHeader requestHeader, Class<T> clazz) {
         RequestMessage request = buildRequest(url, requestHeader.getHeaders());
         ResponseMessage responseMessage = sendRequest(request);
         T response = parseResponse(responseMessage, clazz);
@@ -64,7 +64,7 @@ public class BilibiliApiClient {
         return JSON.parseObject(responseMessage.getBody(), clazz);
     }
 
-    protected void checkResponse(GenericResponse genericResponse) throws AnimeException {
+    protected void checkResponse(GenericResponse genericResponse) {
         if (!genericResponse.getCode().equals(ResponseCode.SUCCESS)) {
             throw new AnimeException(genericResponse.getCode(), genericResponse.getMessage());
         }

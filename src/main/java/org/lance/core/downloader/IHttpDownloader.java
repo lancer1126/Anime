@@ -8,13 +8,13 @@ import org.lance.domain.entity.TaskInfo;
  */
 public interface IHttpDownloader extends Runnable{
 
+    void start();
+
     String getId();
 
     TaskInfo getTaskInfo();
 
     void updateStatus(HttpDownStatus status);
-
-    void start();
 
     void pause();
 

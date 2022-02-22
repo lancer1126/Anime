@@ -11,6 +11,8 @@ public class ThreadContext {
 
     public static final String ANIME_TIMER = "Anime_Timer";
 
+    public static final String ANIME_THREAD_DOWNLOADER = "Anime-Downloader";
+
     static {
         EXECUTOR_TIMER = ThreadContext.newTimerExecutor(1, ANIME_TIMER);
     }
@@ -21,6 +23,18 @@ public class ThreadContext {
 
     public static ScheduledFuture<?> timer(Runnable runnable, long delay, long period, TimeUnit unit) {
         return EXECUTOR_TIMER.scheduleAtFixedRate(runnable, delay, period, unit);
+    }
+
+    public static ExecutorService newExecutor(int corePoolSize, int maxPoolSize, int queueSize,
+                                              long keepAliveTime, String name) {
+        return new ThreadPoolExecutor(
+                corePoolSize,
+                maxPoolSize,
+                keepAliveTime,
+                TimeUnit.SECONDS,
+                new LinkedBlockingDeque<>(queueSize),
+                newThreadFactory(name),
+                new ThreadPoolExecutor.DiscardPolicy());
     }
 
     public static void shutdown(ScheduledFuture<?> scheduledFuture) {

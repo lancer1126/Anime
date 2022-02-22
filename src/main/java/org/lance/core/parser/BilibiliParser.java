@@ -13,6 +13,8 @@ import org.lance.common.utils.CommonUtil;
 import org.lance.common.utils.ConvertUtil;
 import org.lance.core.BilibiliClientCore;
 import org.lance.core.downloader.DefaultHttpDownloader;
+import org.lance.core.downloader.FlvHttpDownloader;
+import org.lance.core.downloader.M4SHttpDownloader;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;
 import org.lance.domain.entity.VideoInfo;
@@ -70,7 +72,7 @@ public final class BilibiliParser extends AbstractParser {
     }
 
     @Override
-    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException {
+    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) {
         TaskInfo taskInfo = new TaskInfo();
         if (StringUtils.isNotBlank(videoInfo.getUrl())) {
             taskInfo.setUrl(videoInfo.getUrl());
@@ -87,11 +89,23 @@ public final class BilibiliParser extends AbstractParser {
     }
 
     @Override
-    public DefaultHttpDownloader buildDownloader(RequestHeader requestHeader, TaskInfo taskInfo) {
-        return null;
+    public DefaultHttpDownloader buildDownloader(RequestHeader reqHeader, TaskInfo taskInfo) {
+        DefaultHttpDownloader httpDownloader = null;
+        switch (taskInfo.getFileType()) {
+            case FLV:
+                httpDownloader = FlvHttpDownloader.newInstance(reqHeader, taskInfo);
+                break;
+            case M4S:
+                httpDownloader = M4SHttpDownloader.newInstance(reqHeader, taskInfo);
+                break;
+            default:
+                log.warn("build Downloader fail... taskInfo = {}", taskInfo);
+                break;
+        }
+        return httpDownloader;
     }
 
-    private String getM4SVideoUrl(VideoInfo videoInfo, RequestHeader requestHeader) throws AnimeException {
+    private String getM4SVideoUrl(VideoInfo videoInfo, RequestHeader requestHeader) {
         PlayUrlM4SDataResp m4sData = BilibiliClientCore.getBilibiliClient().getM4SFormatVideoPlayUrl(videoInfo, requestHeader);
         List<Video> videoList = m4sData.getData().getDash().getVideo();
         List<Audio> audioList = m4sData.getData().getDash().getAudio();
@@ -104,7 +118,7 @@ public final class BilibiliParser extends AbstractParser {
         return String.join(Global.URL_SEPARATOR + videoUrl + audioList.get(0).getBaseUrl());
     }
 
-    private VideoView getBVVideoInfoWithM4S(String bvId, RequestHeader reqHeader) throws AnimeException {
+    private VideoView getBVVideoInfoWithM4S(String bvId, RequestHeader reqHeader) {
         Map<String, String> headers = reqHeader.getHeaders();
         if (headers == null) {
             headers = BiliHttpHeaders.getBilibiliM4sHeaders(bvId);
@@ -183,7 +197,7 @@ public final class BilibiliParser extends AbstractParser {
         return null;
     }
 
-    private VideoView checkVideoInfo(String videoId, BilibiliType type, RequestHeader reqHeader) throws AnimeException {
+    private VideoView checkVideoInfo(String videoId, BilibiliType type, RequestHeader reqHeader) {
         VideoView videoView = null;
         switch (type) {
             case AV:

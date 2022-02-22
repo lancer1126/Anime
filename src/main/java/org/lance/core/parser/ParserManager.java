@@ -1,8 +1,8 @@
 package org.lance.core.parser;
 
 import lombok.extern.slf4j.Slf4j;
-import org.lance.common.AnimeException;
 import org.lance.common.annotation.Parser;
+import org.lance.core.downloader.IHttpDownloader;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.TaskInfo;
 import org.lance.domain.entity.VideoInfo;
@@ -64,7 +64,7 @@ public class ParserManager {
         return videoView;
     }
 
-    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException {
+    public TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) {
         TaskInfo taskInfo = null;
         for (AbstractParser parser : parserList) {
             if (parser.matchParser(videoInfo.getType())) {
@@ -73,6 +73,15 @@ public class ParserManager {
             }
         }
         return taskInfo;
+    }
+
+    public IHttpDownloader buildDownloader(TaskInfo taskInfo, RequestHeader reqHeader) {
+        for (AbstractParser parser : parserList) {
+            if (parser.type() == taskInfo.getType()) {
+                return parser.buildDownloader(reqHeader, taskInfo);
+            }
+        }
+        return null;
     }
 
     private static class ParserManagerHolder {

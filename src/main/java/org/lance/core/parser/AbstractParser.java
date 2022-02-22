@@ -26,7 +26,7 @@ public abstract class AbstractParser {
 
     public abstract VideoView parse(String url, RequestHeader requestHeader);
 
-    public abstract TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo) throws AnimeException;
+    public abstract TaskInfo buildTaskInfo(RequestHeader requestHeader, VideoInfo videoInfo);
 
     public abstract DefaultHttpDownloader buildDownloader(RequestHeader requestHeader, TaskInfo taskInfo);
 
