@@ -7,7 +7,8 @@ import java.util.Map;
 
 @Data
 public class RequestHeader {
-    Map<String, String> headers;
+    private int code;
+    private Map<String, String> headers;
 
     public RequestHeader() {};
 

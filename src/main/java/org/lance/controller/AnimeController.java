@@ -52,7 +52,7 @@ public class AnimeController {
     }
 
     @RequestMapping("/download")
-    public FullHttpResponse download(Channel channel, FullHttpRequest request) throws IOException {
+    public FullHttpResponse download(Channel channel, FullHttpRequest request) {
         String requestContent = request.content().toString(StandardCharsets.UTF_8);
         Map<String, String> paramMap = CommonUtil.parseJSONToEntity(requestContent, new TypeReference<>() {});
         HashMap<String, String> headers = CommonUtil.parseJSONToEntity(paramMap.get("headers"), new TypeReference<>() {});

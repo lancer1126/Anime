@@ -2,6 +2,7 @@ package org.lance.domain.entity;
 
 import lombok.Data;
 import org.lance.common.enums.FileFormatType;
+import org.lance.common.enums.HttpDownStatus;
 import org.lance.common.enums.Type;
 import org.lance.core.downloader.DefaultHttpDownloader;
 import org.lance.domain.RequestHeader;
@@ -27,4 +28,24 @@ public class TaskInfo {
     private long speed;
     private int connectionCount;
     private List<ChunkInfo> chunkInfoList;
+
+    public void setTotalSize(long totalSize) {
+        this.totalSize = new AtomicLong(totalSize);
+    }
+
+    public long getTotalSize() {
+        return totalSize.get();
+    }
+
+    public boolean isPause() {
+        return status == HttpDownStatus.PAUSE.getStatus();
+    }
+
+    public boolean isDownloading() {
+        return status == HttpDownStatus.DOWNLOADING.getStatus();
+    }
+
+    public void addTotalSize(long audioTotalSize) {
+        totalSize.addAndGet(audioTotalSize);
+    }
 }

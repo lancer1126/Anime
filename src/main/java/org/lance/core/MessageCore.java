@@ -65,6 +65,14 @@ public class MessageCore {
         ClientCallback.push(message);
     }
 
+    public static void send(HttpDownStatus status, String msg, TaskInfo taskInfo) {
+        if (status == HttpDownStatus.FAIL || status == HttpDownStatus.COMPLETE) {
+            send(MessageType.CALL_BACK, status, msg, taskInfo);
+        } else {
+            send(MessageType.NORMAL, status, msg, taskInfo);
+        }
+    }
+
     private void loadMessageSendTimer() {
         this.messageSendTimer = ThreadContext.timer(new MessageSendTimer(), 5, 3, TimeUnit.SECONDS);
     }
