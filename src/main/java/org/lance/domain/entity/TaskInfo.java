@@ -48,4 +48,12 @@ public class TaskInfo {
     public void addTotalSize(long audioTotalSize) {
         totalSize.addAndGet(audioTotalSize);
     }
+
+    public long getCurrentOffset() {
+        return currentOffset.get();
+    }
+
+    public void setCurrentOffset(long currentOffset) {
+        this.currentOffset = new AtomicLong(currentOffset);
+    }
 }

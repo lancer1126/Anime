@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.lance.common.enums.HttpDownStatus;
 import org.lance.core.MessageCore;
 import org.lance.domain.RequestHeader;
+import org.lance.domain.entity.ChunkInfo;
 import org.lance.domain.entity.TaskInfo;
 
 import java.net.NoRouteToHostException;
@@ -26,6 +27,7 @@ public abstract class DefaultHttpDownloader implements IHttpDownloader {
     protected int retryTimes;                                       // 重试次数
     protected volatile boolean isResume;                            // 是否是恢复下载
     protected boolean isSupportRange;                               // 是否支持分段下载
+    protected boolean isSingleConnection;                           // 是否是单线程下载
     protected ExecutorService executorService;                      // 线程池
     protected ArrayList<DownloadTask> downloadTasks;                // 任务列表
     protected DownloadSpeedMonitor speedMonitor;                    // 速度监控器
@@ -154,5 +156,13 @@ public abstract class DefaultHttpDownloader implements IHttpDownloader {
         }
         long callbackMinIntervalBytes = totalSize / CALLBACK_DEFAULT_PROGRESS_MAX_COUNT;
         return callbackMinIntervalBytes <= CALLBACK_MIN_INTERVAL_BYTES ? CALLBACK_MIN_INTERVAL_BYTES : callbackMinIntervalBytes;
+    }
+
+    protected void buildChunkInfoList(long totalLength, int connectionCount) {
+
+    }
+
+    protected void handleWithMultipleConnection(final List<ChunkInfo> chunkInfoList) {
+
     }
 }
