@@ -6,9 +6,12 @@ import org.apache.http.HttpStatus;
 import org.lance.common.AnimeException;
 import org.lance.common.constrants.Global;
 import org.lance.common.enums.HttpDownStatus;
+import org.lance.common.utils.FFmpegUtil;
 import org.lance.common.utils.FileUtils;
 import org.lance.common.utils.HttpDownUtil;
 import org.lance.common.utils.HttpUtil;
+import org.lance.core.DelayHandleCore;
+import org.lance.domain.DelayHandleTask;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.ChunkInfo;
 import org.lance.domain.entity.ConnectInfo;
@@ -168,6 +171,28 @@ public class M4SHttpDownloader extends DefaultHttpDownloader {
                     log.info(Thread.currentThread().getName() + "在执行下载任务");
                     executorService.submit(task);
                 });
+            }
+        }
+    }
+
+    @Override
+    public void onComplete(DownloadTask task) {
+        synchronized (this) {
+            super.onComplete(task);
+            if (this.complete()) {
+                log.debug("M4SHttpDownloader onComplete");
+                onComplete("下载完成，合并文件中，请等待...");
+            }
+            boolean isSuccess = FFmpegUtil.convert(filePath, videoFilePath, audioFilePath);
+            if (isSuccess) {
+                onComplete("合并成功");
+                DelayHandleTask videoTask = DelayHandleTask.delayTask(DelayHandleTask.Type.DELETE_FILE, videoFilePath);
+                DelayHandleTask audioTask = DelayHandleTask.delayTask(DelayHandleTask.Type.DELETE_FILE, audioFilePath);
+                DelayHandleCore.getInstance().addTask(videoTask);
+                DelayHandleCore.getInstance().addTask(audioTask);
+            } else {
+                log.error("m4s video merge fail");
+                onError("视频合并失败，请检查当前系统是否有 ffmpeg 环境");
             }
         }
     }

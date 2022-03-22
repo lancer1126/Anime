@@ -165,4 +165,31 @@ public abstract class DefaultHttpDownloader implements IHttpDownloader {
     protected void handleWithMultipleConnection(final List<ChunkInfo> chunkInfoList) {
 
     }
+
+    public void onComplete(String msg) {
+        this.msg = msg;
+        updateStatus(HttpDownStatus.COMPLETE);
+    }
+
+    public void onComplete(DownloadTask task) {
+        if (isSingleConnection) {
+            if (taskInfo.getCurrentOffset() < taskInfo.getTotalSize()) {
+                onError("下载出现错误，请单击【resume】按钮恢复下载");
+            } else {
+                updateStatus(HttpDownStatus.COMPLETE);
+            }
+        } else {
+            long currentOffset = task.getChunkInfo().getCurrentOffset();
+            long endOffset = task.getChunkInfo().getEndOffset();
+            if (currentOffset < endOffset) {
+                onError("下载出现错误，请单击【resume】按钮恢复下载");
+            } else {
+                downloadTasks.remove(task);
+                if (downloadTasks.isEmpty()) {
+                    updateStatus(HttpDownStatus.COMPLETE);
+                }
+            }
+        }
+    }
+
 }

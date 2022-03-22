@@ -5,6 +5,9 @@ import org.lance.core.downloader.IHttpDownloader;
 import org.lance.core.downloader.M4SHttpDownloader;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,5 +43,18 @@ public class HttpDownUtil {
     public static String getTaskFilePathWithoutSuffix(M4SHttpDownloader downloader) {
         return downloader.getTaskInfo().getFilePath() + File.separator
                 + downloader.getTaskInfo().getName();
+    }
+
+    public static HttpURLConnection connect(String url, Map<String, String> headers) throws IOException {
+        URL url1 = new URL(url);
+        HttpURLConnection urlConnection = (HttpURLConnection) url1.openConnection();
+        urlConnection.setConnectTimeout(10000);
+        urlConnection.setReadTimeout(10000);
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
+            }
+        }
+        return urlConnection;
     }
 }
