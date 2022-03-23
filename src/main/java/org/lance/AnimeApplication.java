@@ -22,6 +22,8 @@ public class AnimeApplication extends AbstractApplication {
         DownloaderManager.getInstance().init();
         MessageCore.getInstance().init();
         BilibiliClientCore.init();
+        log.info("http服务开启，端口：" + REST_PORT);
+        log.info("websocket服务开启，端口：" + WEBSOCKET_PORT);
     }
 
     @Override

@@ -60,7 +60,6 @@ public class BilibiliApiClient {
         if (responseMessage == null || StringUtils.isBlank(responseMessage.getBody())) {
             return null;
         }
-        log.info("Response Data: " + responseMessage.getBody());
         return JSON.parseObject(responseMessage.getBody(), clazz);
     }
 

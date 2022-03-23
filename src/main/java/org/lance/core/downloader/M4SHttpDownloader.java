@@ -60,6 +60,7 @@ public class M4SHttpDownloader extends DefaultHttpDownloader {
 
         msg = "";
         updateStatus(HttpDownStatus.DOWNLOADING);
+        log.info("开始在M4S多线程处理下载任务, 线程名：" + Thread.currentThread().getName());
         callbackMinIntervalBytes = calcCallbackMinIntervalBytes(taskInfo.getTotalSize());
 
         try {

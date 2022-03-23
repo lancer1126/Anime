@@ -1,6 +1,7 @@
 package org.lance.core;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.lance.common.enums.HttpDownStatus;
 import org.lance.common.enums.MessageType;
 import org.lance.domain.Message;
@@ -73,6 +74,31 @@ public class MessageCore {
         }
     }
 
+    public static void delete(String msgId) {
+        log.info("删除messageId-" + msgId);
+        if (StringUtils.isBlank(msgId) || taskIdMessageMap.isEmpty()) return;
+
+        String[] ids = msgId.split(SEPARATE);
+        if (ids.length != 2) {
+            log.warn("messageId format error: {}", msgId);
+            return;
+        }
+
+        synchronized (LOCK) {
+            String taskId = ids[0];
+            Map<String, Message> messageMap = taskIdMessageMap.get(taskId);
+            if (messageMap == null) return;
+
+            String id = messageMap.keySet().stream()
+                    .findFirst().get();
+            if (Objects.equals(msgId, id)) {
+                callbackMessageList.remove(messageMap.values().stream().findFirst().get());
+                taskIdMessageMap.remove(taskId);
+            }
+        }
+
+    }
+
     private void loadMessageSendTimer() {
         this.messageSendTimer = ThreadContext.timer(new MessageSendTimer(), 5, 3, TimeUnit.SECONDS);
     }
@@ -101,7 +127,6 @@ public class MessageCore {
             if (callbackMessageList.isEmpty()) {
                 return;
             }
-            log.info("callbackMessageList: " + callbackMessageList);
             for (Message message : callbackMessageList) {
                 send(message);
             }
