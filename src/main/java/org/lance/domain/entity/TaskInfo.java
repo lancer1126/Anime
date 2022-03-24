@@ -56,4 +56,8 @@ public class TaskInfo {
     public void setCurrentOffset(long currentOffset) {
         this.currentOffset = new AtomicLong(currentOffset);
     }
+
+    public void increaseSize(long increaseBytes) {
+        this.currentOffset.addAndGet(increaseBytes);
+    }
 }

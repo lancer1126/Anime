@@ -1,6 +1,7 @@
 package org.lance.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.client.config.RequestConfig;
@@ -39,7 +40,7 @@ public class HttpUtil {
         HttpGet httpGet = new HttpGet(url);
 
         List<Header> headerList = new ArrayList<>();
-        if (CollUtil.isNotEmpty(headerList)) {
+        if (MapUtil.isNotEmpty(headers)) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 Header header = new BasicHeader(entry.getKey(), entry.getValue());
                 headerList.add(header);

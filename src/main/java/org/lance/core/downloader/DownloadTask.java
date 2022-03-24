@@ -46,8 +46,9 @@ public class DownloadTask implements Runnable {
         RandomAccessFile raf = null;
         FileDescriptor fileDesc = null;
         BufferedOutputStream outStream = null;
-        while (true) {
+        do {
             try {
+                log.info("chunkInfoSize: " + chunkInfo.getEndOffset());
                 raf = new RandomAccessFile(path, "rw");
                 raf.seek(chunkInfo.getCurrentOffset());
                 fileDesc = raf.getFD();
@@ -57,7 +58,7 @@ public class DownloadTask implements Runnable {
                 if (paused) return;
 
                 byte[] buffer = new byte[BUFFER_SIZE];
-                int readLen = 0;
+                int readLen;
                 while (downloader.downloading()) {
                     readLen = inputStream.read(buffer);
                     if (readLen <= -1) {
@@ -65,6 +66,8 @@ public class DownloadTask implements Runnable {
                         break;
                     }
                     outStream.write(buffer, 0, readLen);
+                    chunkInfo.increaseSize(readLen);
+                    downloader.onProcess(readLen);
                 }
                 break;
             } catch (IOException ioe) {
@@ -86,7 +89,7 @@ public class DownloadTask implements Runnable {
             } finally {
                 closeStream(outStream, fileDesc, raf);
             }
-        }
+        } while (true);
     }
 
     public void pause() {

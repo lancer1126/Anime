@@ -1,6 +1,5 @@
 package org.lance.core.downloader;
 
-import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.lance.common.AnimeException;
@@ -18,7 +17,6 @@ import org.lance.domain.entity.ConnectInfo;
 import org.lance.domain.entity.TaskInfo;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -2,6 +2,7 @@ package org.lance.core.downloader;
 
 import lombok.extern.slf4j.Slf4j;
 import org.lance.common.enums.HttpDownStatus;
+import org.lance.common.enums.MessageType;
 import org.lance.core.MessageCore;
 import org.lance.domain.RequestHeader;
 import org.lance.domain.entity.ChunkInfo;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 下载器母类
@@ -31,6 +34,11 @@ public abstract class DefaultHttpDownloader implements IHttpDownloader {
     protected ExecutorService executorService;                      // 线程池
     protected ArrayList<DownloadTask> downloadTasks;                // 任务列表
     protected DownloadSpeedMonitor speedMonitor;                    // 速度监控器
+
+    private volatile long lastCallbackTimestamp = 0;
+    private volatile boolean isFirstCallbackProgressToUser = true;
+    private final AtomicLong callbackIncreaseBuffer = new AtomicLong();
+    private final AtomicBoolean needCallbackProgressToUser = new AtomicBoolean(false);
 
     protected static final int NO_ANY_PROGRESS_CALLBACK = -1;
     protected static final int CALLBACK_MIN_INTERVAL_BYTES = 1024;
@@ -139,6 +147,17 @@ public abstract class DefaultHttpDownloader implements IHttpDownloader {
         updateStatus(HttpDownStatus.RETRY);
     }
 
+    public void onProcess(long increaseBytes) {
+        taskInfo.increaseSize(increaseBytes);
+        speedMonitor.update(taskInfo.getCurrentOffset());
+        taskInfo.setSpeed(speedMonitor.getSpeed());
+
+        callbackIncreaseBuffer.addAndGet(increaseBytes);
+        final long now = System.currentTimeMillis();
+        checkIsCallBackToUser(now);
+        handleProcess();
+    }
+
     public boolean isRetry(Exception e) {
         // 若为下列异常以及retryTimes大于0，执行重连
         if (retryTimes > 0
@@ -192,4 +211,29 @@ public abstract class DefaultHttpDownloader implements IHttpDownloader {
         }
     }
 
+    private void checkIsCallBackToUser(long now) {
+        boolean needCallBack = false;
+        if (isFirstCallbackProgressToUser) {
+            isFirstCallbackProgressToUser = false;
+            needCallBack = true;
+        } else {
+            if ((now - lastCallbackTimestamp) >= CALLBACK_MIN_INTERVAL_MILLIS
+                    || ((callbackMinIntervalBytes != NO_ANY_PROGRESS_CALLBACK)
+                    && callbackIncreaseBuffer.get() >= callbackMinIntervalBytes)) {
+                needCallBack = true;
+            }
+        }
+
+        if (needCallBack && needCallbackProgressToUser.compareAndSet(false, true)) {
+            lastCallbackTimestamp = now;
+            callbackIncreaseBuffer.set(0L);
+        }
+    }
+
+    private void handleProcess() {
+        if (needCallbackProgressToUser.compareAndSet(true, false)) {
+            log.info("大小：" + taskInfo.getSpeed());
+            MessageCore.send(MessageType.NORMAL, HttpDownStatus.DOWNLOADING, "", taskInfo);
+        }
+    }
 }

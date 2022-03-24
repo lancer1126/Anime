@@ -13,4 +13,8 @@ public class ChunkInfo {
     private long currentOffset;
     private int status;
     private long speed;
+
+    public void increaseSize(long increaseBytes) {
+        this.currentOffset += increaseBytes;
+    }
 }

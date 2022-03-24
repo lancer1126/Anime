@@ -11,7 +11,7 @@ public class FFmpegUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FFmpegUtil.class);
 
-    private static final String FFMPEG_PATH = "ffmpeg";
+    private static final String FFMPEG_PATH = "D:\\CodeSpace\\GitHub\\Java\\AnimeDownloader\\ffmpeg.exe";
 
     public static boolean run(String command) {
         Process process = null;

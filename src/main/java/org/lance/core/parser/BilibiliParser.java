@@ -44,9 +44,8 @@ public final class BilibiliParser extends AbstractParser {
         super(Type.BILIBILI);
     }
 
-    @SneakyThrows
     @Override
-    public VideoView parse(String url, RequestHeader reqtHeader) {
+    public VideoView parse(String url, RequestHeader reqHeader) {
         log.info("parsing Bilibili Video...");
         String videoId;
         VideoView videoView = null;
@@ -61,7 +60,7 @@ public final class BilibiliParser extends AbstractParser {
                     }
                     BilibiliType videoType = checkBiliType(ptnStr);
                     if (videoType == null) continue;
-                    videoView = checkVideoInfo(videoId, videoType, reqtHeader);
+                    videoView = checkVideoInfo(videoId, videoType, reqHeader);
                     break;
                 }
             }
@@ -115,7 +114,7 @@ public final class BilibiliParser extends AbstractParser {
                 .findAny()
                 .map(Video::getBaseUrl)
                 .orElse("");
-        return String.join(Global.URL_SEPARATOR + videoUrl + audioList.get(0).getBaseUrl());
+        return String.join(Global.URL_SEPARATOR , videoUrl, audioList.get(0).getBaseUrl());
     }
 
     private VideoView getBVVideoInfoWithM4S(String bvId, RequestHeader reqHeader) {
